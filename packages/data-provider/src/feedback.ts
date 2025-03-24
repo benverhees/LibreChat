@@ -1,9 +1,9 @@
-export type TFeedbackRating = 'thumbsUp' | 'thumbsDown' | null;
+export type TFeedbackRating = 'thumbsUp' | 'thumbsDown' | undefined;
 
-export interface TFeedbackContent {
-  tags: string[];
-  text?: string | null;
-}
+export type TFeedbackContent = {
+  tags?: TFeedbackTag[];
+  text?: string;
+};
 
 export const feedbackTags = {
   thumbsDown: [
@@ -17,10 +17,15 @@ export const feedbackTags = {
     'com_ui_feedback_tag_biased',
     'com_ui_feedback_tag_other',
   ],
-  // In the future, you could add positive feedback tags here
-  thumbsUp: [],
+  thumbsUp: [
+    'com_ui_feedback_tag_helpful',
+    'com_ui_feedback_tag_clear',
+    'com_ui_feedback_tag_concise',
+    'com_ui_feedback_tag_creative',
+    'com_ui_feedback_tag_knowledgeable',
+    'com_ui_feedback_tag_engaging',
+    'com_ui_feedback_tag_other',
+  ]
 } as const;
 
-export type TFeedbackTag =
-  | (typeof feedbackTags.thumbsDown)[number]
-  | (typeof feedbackTags.thumbsUp)[number];
+export type TFeedbackTag = typeof feedbackTags.thumbsDown[number] | typeof feedbackTags.thumbsUp[number];

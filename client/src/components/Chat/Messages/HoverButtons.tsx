@@ -1,20 +1,19 @@
 import React, { useState, useMemo, memo } from 'react';
 import { useRecoilState } from 'recoil';
-import type { TConversation, TMessage, TMessageFeedback } from 'librechat-data-provider';
+import type { TConversation, TFeedbackRating, TMessage, TMessageFeedback } from 'librechat-data-provider';
 import {
   EditIcon,
   Clipboard,
   CheckMark,
   ContinueIcon,
   RegenerateIcon,
-  ThumbUpIcon,
-  ThumbDownIcon,
 } from '~/components/svg';
 import { useGenerationsByLatest, useLocalize } from '~/hooks';
 import { Fork } from '~/components/Conversations';
 import MessageAudio from './MessageAudio';
 import { cn } from '~/utils';
 import store from '~/store';
+import Feedback from './Feedback';
 
 type THoverButtons = {
   isEditing: boolean;
@@ -28,7 +27,7 @@ type THoverButtons = {
   latestMessage: TMessage | null;
   isLast: boolean;
   index: number;
-  handleFeedback: (rating: 'thumbsUp' | 'thumbsDown', extraPayload?: any) => void;
+  handleFeedback: (rating: TFeedbackRating, payload?: any) => void;
   rated: TMessageFeedback | undefined;
 };
 
@@ -170,10 +169,6 @@ const HoverButtons = ({
 
   const { isCreatedByUser, error } = message;
 
-  const safeRated: TMessageFeedback = rated || { rating: null };
-  const currentRating = message.rating != null ? message.rating : safeRated.rating;
-  const disableFeedback = message.rating != null || safeRated.rating != null;
-
   // If message has an error, only show regenerate button
   if (error === true) {
     return (
@@ -268,29 +263,14 @@ const HoverButtons = ({
 
       {/* Feedback Buttons */}
       {!isCreatedByUser && (
-        <>
-          <HoverButton
-            onClick={() => handleFeedback('thumbsUp')}
-            title={localize('com_ui_feedback_positive')}
-            icon={<ThumbUpIcon size="19" bold={currentRating === 'thumbsUp'} />}
-            isDisabled={disableFeedback || currentRating === 'thumbsDown'}
-            isVisible={currentRating !== 'thumbsDown'}
+          <Feedback
             isLast={isLast}
-            className="active"
+            handleFeedback={handleFeedback}
+            rating={message.rating}
+            feedback={message.ratingContent}
           />
-
-          <HoverButton
-            onClick={() => handleFeedback('thumbsDown')}
-            title={localize('com_ui_feedback_negative')}
-            icon={<ThumbDownIcon size="19" bold={currentRating === 'thumbsDown'} />}
-            isDisabled={disableFeedback || currentRating === 'thumbsUp'}
-            isVisible={currentRating !== 'thumbsUp'}
-            isLast={isLast}
-            className="active"
-          />
-        </>
-      )}
-
+        )}
+      
       {/* Continue Button */}
       {continueSupported && (
         <HoverButton

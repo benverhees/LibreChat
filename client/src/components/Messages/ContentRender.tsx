@@ -1,6 +1,6 @@
 import { useRecoilValue } from 'recoil';
-import { useCallback, useMemo, memo } from 'react';
-import type { TMessage, TMessageContentParts } from 'librechat-data-provider';
+import { useCallback, useMemo, memo, useState } from 'react';
+import { type TMessage, type TMessageContentParts } from 'librechat-data-provider';
 import type { TMessageProps, TMessageIcon } from '~/common';
 import ContentParts from '~/components/Chat/Messages/Content/ContentParts';
 import PlaceholderRow from '~/components/Chat/Messages/ui/PlaceholderRow';
@@ -8,7 +8,7 @@ import SiblingSwitch from '~/components/Chat/Messages/SiblingSwitch';
 import HoverButtons from '~/components/Chat/Messages/HoverButtons';
 import MessageIcon from '~/components/Chat/Messages/MessageIcon';
 import SubRow from '~/components/Chat/Messages/SubRow';
-import { useMessageActions } from '~/hooks';
+import { useMessageActions, useLocalize } from '~/hooks';
 import { cn, logger } from '~/utils';
 import store from '~/store';
 
@@ -49,6 +49,8 @@ const ContentRender = memo(
       copyToClipboard,
       setLatestMessage,
       regenerateMessage,
+      handleFeedback,
+      rated,
     } = useMessageActions({
       message: msg,
       currentEditId,
@@ -56,8 +58,13 @@ const ContentRender = memo(
       setCurrentEditId,
     });
 
+    const localize = useLocalize();
     const maximizeChatSpace = useRecoilValue(store.maximizeChatSpace);
     const fontSize = useRecoilValue(store.fontSize);
+
+    const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+    const [showThankYou, setShowThankYou] = useState(false);
+
     const handleRegenerateMessage = useCallback(() => regenerateMessage(), [regenerateMessage]);
     // const { isCreatedByUser, error, unfinished } = msg ?? {};
     const isLast = useMemo(
@@ -196,6 +203,8 @@ const ContentRender = memo(
                 handleContinue={handleContinue}
                 latestMessage={latestMessage}
                 isLast={isLast}
+                handleFeedback={handleFeedback}
+                rated={rated}
               />
             </SubRow>
           )}

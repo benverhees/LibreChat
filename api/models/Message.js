@@ -227,12 +227,8 @@ async function updateMessage(req, message, metadata) {
     const { messageId, ...update } = message;
     const updatedMessage = await Message.findOneAndUpdate(
       { messageId, user: req.user.id },
-      update,
-      {
-        new: true,
-      },
+      { $set: update }
     );
-
     if (!updatedMessage) {
       throw new Error('Message not found or user not authorized.');
     }
@@ -245,6 +241,8 @@ async function updateMessage(req, message, metadata) {
       text: updatedMessage.text,
       isCreatedByUser: updatedMessage.isCreatedByUser,
       tokenCount: updatedMessage.tokenCount,
+      rating: updatedMessage.rating,
+      ratingContent: updatedMessage.ratingContent
     };
   } catch (err) {
     logger.error('Error updating message:', err);

@@ -12,7 +12,6 @@ const { findAllArtifacts, replaceArtifactContent } = require('~/server/services/
 const { requireJwtAuth, validateMessageReq } = require('~/server/middleware');
 const { countTokens } = require('~/server/utils');
 const { logger } = require('~/config');
-
 const router = express.Router();
 router.use(requireJwtAuth);
 
@@ -180,37 +179,41 @@ router.put('/:conversationId/:messageId/feedback', validateMessageReq, async (re
     const { conversationId, messageId } = req.params;
     const { rating, ratingContent } = req.body;
 
-    // Update the message feedback.
-    const updatedMessage = await updateMessage(req, {
-      messageId,
-      rating,
-      ratingContent,
-    });
+    // Prepare update parameters
+    let updateParams = { messageId };
+    
+    if (rating === undefined) {
+      // Remove rating and ratingContent with direct null values
+      updateParams.rating = null;
+      updateParams.ratingContent = null;
+    } else {
+      // Set rating
+      updateParams.rating = rating;
+      
+      // Properly structure ratingContent to ensure tags is an array
+      if (ratingContent) {
+        updateParams.ratingContent = {
+          tags: Array.isArray(ratingContent.tags) ? ratingContent.tags : [],
+          text: typeof ratingContent.text === 'string' ? ratingContent.text : ''
+        };
+      } else {
+        // No ratingContent provided
+        updateParams.ratingContent = null;
+      }
+    }
+    // Use updateMessage to ensure consistency
+    const updatedMessage = await updateMessage(req, updateParams);
 
     if (!updatedMessage) {
       return res.status(400).json({ error: 'Failed to update feedback' });
     }
 
-    // Build the response ratingContent.
-    // Start with whatever the updateMessage function returned.
-    let responseRatingContent = updatedMessage.ratingContent || {};
-
-    // For thumbsDown, if no tag choices are present, merge the default choices.
-    if (rating === 'thumbsDown') {
-      if (ratingContent && ratingContent.tags && !responseRatingContent.tags) {
-        responseRatingContent.tags = ratingContent.tags;
-      }
-      if (ratingContent && ratingContent.text && !responseRatingContent.text) {
-        responseRatingContent.text = ratingContent.text;
-      }
-    }
-
-    // Return all the feedback details.
+    // Return all the feedback details
     return res.status(200).json({
       messageId: updatedMessage.messageId,
       conversationId: updatedMessage.conversationId,
-      rating: updatedMessage.rating || rating,
-      ratingContent: responseRatingContent,
+      rating: updatedMessage.rating,
+      ratingContent: updatedMessage.ratingContent
     });
   } catch (error) {
     logger.error('Error updating message feedback:', error);

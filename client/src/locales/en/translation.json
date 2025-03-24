@@ -848,7 +848,6 @@
   "com_ui_feedback_more_information": "Provide additional feedback",
   "com_ui_feedback_positive": "Good response",
   "com_ui_feedback_negative": "Bad response",
-  "com_ui_feedback_more": "More...",
   "com_ui_feedback_tag_memory": "Shouldn't have used Memory",
   "com_ui_feedback_tag_style": "Don't like the style",
   "com_ui_feedback_tag_incorrect": "Not factually correct",
@@ -858,9 +857,16 @@
   "com_ui_feedback_tag_unsafe": "Unsafe or problematic",
   "com_ui_feedback_tag_biased": "Biased",
   "com_ui_feedback_tag_other": "Other",
+  "com_ui_feedback_tag_helpful": "Very helpful",
+  "com_ui_feedback_tag_clear": "Clear and easy to understand",
+  "com_ui_feedback_tag_concise": "Concise and to the point",
+  "com_ui_feedback_tag_creative": "Creative solution",
+  "com_ui_feedback_tag_knowledgeable": "Knowledgeable response",
+  "com_ui_feedback_tag_engaging": "Engaging interaction",
   "com_ui_write": "Writing",
   "com_ui_yes": "Yes",
   "com_ui_zoom": "Zoom",
   "com_user_message": "You",
-  "com_warning_resubmit_unsupported": "Resubmitting the AI message is not supported for this endpoint."
+  "com_warning_resubmit_unsupported": "Resubmitting the AI message is not supported for this endpoint.",
+  "com_ui_more": "More..."
 }
