@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 
 
+
+- no changes
 ## [v0.7.8] - 
 
 Changes from v0.7.8-rc1 to v0.7.8.
@@ -44,6 +46,7 @@ Changes from v0.7.8-rc1 to v0.7.8.
 [release-v0.7.8]: https://github.com/danny-avila/LibreChat/releases/tag/v0.7.8
 
 ---
+## [v0.7.8-rc1] - 
 ## [v0.7.8-rc1] - 
 
 Changes from v0.7.7 to v0.7.8-rc1.
