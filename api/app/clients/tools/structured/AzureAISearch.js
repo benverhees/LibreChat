@@ -22,15 +22,32 @@ const azureAISearchJsonSchema = {
   properties: {
     query: {
       type: 'string',
-      description: 'Search word or phrase to Azure AI Search',
+      description: 'Text for keyword search',
+    },
+    filter: {
+      type: 'string',
+      description: 'The OData $filter expression to apply to the search query.',
+    },
+    vectorQueryText: {
+      type: 'string',
+      description:
+        'The text to be vectorized to perform a vector search query. Only use when vector search is configured.',
     },
   },
   required: ['query'],
 };
 
+const parseVectorFields = (value) =>
+  value
+    ? value
+        .split(',')
+        .map((field) => field.trim())
+        .filter((field) => field.length > 0)
+    : [];
+
 class AzureAISearch extends Tool {
   // Constants for default values
-  static DEFAULT_API_VERSION = '2023-11-01';
+  static DEFAULT_API_VERSION = '2025-09-01';
   static DEFAULT_QUERY_TYPE = 'simple';
   static DEFAULT_TOP = 5;
 
@@ -84,6 +101,9 @@ class AzureAISearch extends Tool {
       fields.AZURE_AI_SEARCH_SEARCH_OPTION_SELECT,
       'AZURE_AI_SEARCH_SEARCH_OPTION_SELECT',
     );
+    this.vectorFields = parseVectorFields(
+      this._initializeField(fields.AZURE_AI_SEARCH_VECTOR_FIELDS, 'AZURE_AI_SEARCH_VECTOR_FIELDS'),
+    );
 
     // Check for required fields
     if (!this.override && (!this.serviceEndpoint || !this.indexName || !this.apiKey)) {
@@ -113,12 +133,25 @@ class AzureAISearch extends Tool {
 
   // Improved error handling and logging
   async _call(data) {
-    const { query } = data;
+    const { query, filter, vectorQueryText } = data;
     try {
       const searchOption = {
         queryType: this.queryType,
         top: typeof this.top === 'string' ? Number(this.top) : this.top,
       };
+      if (filter) {
+        searchOption.filter = filter;
+      }
+      if (vectorQueryText) {
+        if (this.vectorFields.length === 0) {
+          throw new Error(
+            'AZURE_AI_SEARCH_VECTOR_FIELDS must be configured when using vector search queries.',
+          );
+        }
+        searchOption.vectorSearchOptions = {
+          queries: [{ kind: 'text', text: vectorQueryText, fields: this.vectorFields }],
+        };
+      }
       if (this.select) {
         searchOption.select = this.select.split(',');
       }

@@ -226,7 +226,16 @@ export const azureAISearchSchema: ExtendedJsonSchema = {
   properties: {
     query: {
       type: 'string',
-      description: 'Search word or phrase to Azure AI Search',
+      description: 'Text for keyword search',
+    },
+    filter: {
+      type: 'string',
+      description: 'The OData $filter expression to apply to the search query.',
+    },
+    vectorQueryText: {
+      type: 'string',
+      description:
+        'The text to be vectorized to perform a vector search query. Only use when vector search is configured.',
     },
   },
   required: ['query'],
